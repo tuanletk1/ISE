@@ -1,0 +1,376 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+  <link rel="stylesheet" href="{% static 'main.css' %}"
+        type="text/css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script
+    src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+  <title>Image Search Engine</title>
+</head>
+
+<body>
+<div
+  class="wrapper max-w-[1500px] m-auto bg-[#F6FAFF] flex font-Primary-regular">
+  <!-- Container -->
+  <div class="container bg-white m-auto">
+
+    <!-- Header -->
+    <header class="header border-b-4 border-[#F6F6F6]">
+
+      <!-- Navbar -->
+      <nav
+        class="navbar flex justify-between items-center w-full pl-16 pr-10 py-1">
+
+        <!-- The logo of page -->
+        <h1 class="logo">
+          <a href="{% url 'homepage' %}"
+             class="w-full h-full">
+            <img
+              src="../../static/assets/images/Logo_ISE_fullHD.png"
+              alt="The logo of Image Search Engine">
+          </a>
+        </h1>
+        <!-- End the logo of page -->
+
+        <!-- The information of the user -->
+        <div
+          class="infor-user flex gap-3 justify-center items-center group cursor-pointer">
+
+          {% if request.session.auth %}
+            <div
+              class="detail-infor-user flex flex-col h-full relative w-[190px] p-2 overflow-hidden">
+              <span
+                class="font-Primary-bold text-[#25396F] text-xl truncate">{{ request.session.auth.username }} </span>
+              <span
+                class="font-Primary-bold text-[#7C8DB5] text-lg truncate">{{ request.session.auth.email }}</span>
+              <div
+                class="w-full right-0 translate-x-full group-hover:translate-x-0 rounded-l-xl py-2 px-4 bg-slate-100 z-10 absolute border-2 border-[#51459E] border-dashed transition-all duration-500 ease-in-out">
+                <a href="{% url 'logout' %}">
+                  <button onclick="{console.log('logout')}"
+                          class="w-full flex justify-between items-center font-Primary-bold text-lg pl-2 text-blue-700 uppercase">
+                    Sign
+                    out
+                    <i
+                      class="fa-solid fa-right-from-bracket border-2 border-blue-500 p-2 text-blue-500"></i>
+                  </button>
+                </a>
+              </div>
+            </div>
+          {% else %}
+            <div class="flex gap-6">
+              <a href="{% url 'login' %}" class="w-[100px] h-[40px] font-Primary-bold font-medium text-lg flex justify-center
+              items-center border-2 bg-[#51459E] p-[9px] rounded-[10px] text-[#DEE1E6]
+              hover:bg-[#DEE1E6] hover:text-[#51459E] hover:border-[#51459E]
+              transition-all duration-500 ease-in-out uppercase">Sign
+                in
+              </a>
+              <a href="{% url 'register' %}" class="w-[100px] h-[40px] font-Primary-bold font-medium text-lg flex justify-center
+              items-center border-2 bg-[#DEE1E6] p-[9px] rounded-[10px] text-[#51459E]
+              hover:bg-[#51459E]  hover:text-[#DEE1E6] hover:border-[#DEE1E6]
+              transition-all duration-500 ease-in-out uppercase">Sign
+                up
+              </a>
+            </div>
+          {% endif %}
+        </div>
+        <!-- End the information of the user -->
+
+      </nav>
+      <!-- End the navbar -->
+
+    </header>
+    <!-- End the header -->
+
+    <!-- Page content -->
+    <div class="content flex my-4">
+
+      <!-- Side menu section -->
+      <div
+        class="side-menu flex flex-col w-1/4 h-full justify-center items-center border-r-2 border-[#F6F6F6]">
+
+        <!-- Dashboard button -->
+        <div class="dashboard-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'homepage' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-sliders text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Home</span>
+        <!-- End the dashboard button -->
+        {% if request.session.auth.permission == 'admin' %}
+
+          <!-- User management button -->
+          <div class="user-management-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'user' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-user-large text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">User</span>
+          <!-- End the user management button -->
+
+          <!-- Moderator management button -->
+          <div class="moderator-management-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'mod' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-user-shield text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Moderator</span>
+          <!-- End the moderator management button -->
+        {% endif %}
+
+        <!-- Crawl Data button -->
+        {% if request.session.auth.permission != 'user' and request.session.auth %}
+          <div class="crawl-data-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'crawl' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-database text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Crawl Data</span>
+          <!-- End the dashboard button -->
+        {% endif %}
+
+        <!-- Recent button -->
+        <div class="recent-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'recent' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-clock text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Recent</span>
+        <!-- End the recent button -->
+
+        <!-- Favorites button -->
+        <div class="favorites-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'favorite' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-heart text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Favorites</span>
+        <!-- End the favorites button -->
+
+      </div>
+      <!-- End the side menu section -->
+
+      <!-- Main content -->
+      <div class="main-content w-full mx-10">
+
+        <!-- Upload image section -->
+        <section class="upload-image-section bg-[#F6F5FF] flex rounded-xl py-10
+          justify-center items-center drop-shadow-lg w-full">
+          <div class="w-full flex px-10">
+            <div
+              class="product-image w-[300px] h-[300px] rounded-md border-2 border-blue-600">
+              <img src="../.{{ search_file }}"
+                   alt="The product image"
+                   class="w-[300px] h-[300px] rounded-md object-contain border-2 border-red-500">
+            </div>
+            <div
+              class="product-image-information flex flex-col ml-10">
+              <span
+                class="product-image-name">The object <strong>Search Item</strong></span>
+              <span
+                class="product-image-size">Image size: <strong>800x800</strong></span>
+              <a href="{% url 'homepage' %}">
+                <div
+                  class="flex gap-2 border-2 border-[#51459E] rounded-md w-fit p-1 items-center mt-2">
+                  <i
+                    class="fa-solid fa-right-to-bracket text-[#51459E] text-2xl rotate-180"></i>
+                  <span
+                    class="font-Primary-bold text-xl text-[#51459E]">Back</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </section>
+        <!-- End the upload image section -->
+
+        <!-- Product detail title -->
+        <h2
+          class="product-detail-title font-Primary-bold text-[#51459E] mt-10 text-3xl">
+          Sites containing
+          information
+          about the
+          image</h2>
+        <!-- End the product detail title -->
+
+        <!-- Display image section wrapper-->
+        <section
+          class="display-image-section mt-10 mb-5 w-full drop-shadow-sm">
+
+          <!-- Display card section -->
+          <div
+            class="render-product-card flex flex-wrap gap-8 justify-start">
+            {% if not filters %}
+              <div style="text-align: center">
+
+                <p>Not found
+                  similar image in dataset!</p>
+              </div>
+            {% endif %}
+            {% for filter in filters %}
+              {% for product in products %}
+                {% if product.original_id == filter %}
+                  <!-- Product card -->
+                  <div
+                    class="product-card rounded-2xl overflow-hidden border-2 border-[#51459E]"
+                    id="product-{{ product.id }}">
+
+                    <!-- Product image card -->
+                    <a
+                      href="{% url 'to_product' id=product.id %}"
+                      target="_blank">
+                      <div
+                        class="group w-[250px] flex flex-col justify-center items-center mb-3 border-b border-gray-400 relative">
+                        <div>
+                          <img
+                            src="{{ product.images_link }}"
+                            class="w-full">
+                        </div>
+                        <div
+                          class="overlay-content px-2 pt-12 align-middle items-center bg-slate-100 absolute w-full h-[330px] top-0 z-10 duration-700 ease-in-out translate-x-full group-hover:translate-x-0">
+      <span
+        class="absolute text-base uppercase w-full h-[42px] font-Primary-bold py-2 text-red-500 ml-2 top-0 left-0 border-b-2 border-red-500 border-dashed">More
+        information</span>
+                          <p
+                            class="line-clamp-5 mb-2 text-base font-Primary-bold text-[#51459E] w-full">{{ product.product_name }}</p>
+                          <p
+                            class="flex w-full pt-2 justify-between font-Primary-bold text-base text-red-500 border-t-2 border-red-500 border-dashed ">
+                            Price:
+                            <span
+                              class="text-[#51459E]">{{ product.price }}đ </span>
+                          </p>
+                          <p
+                            class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                            Discount: <span
+                            class="text-[#51459E]">{{ product.discount }}
+          <i class="fa-solid fa-percent"></i></span>
+                          </p>
+                          <p
+                            class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                            Quantity Sold:
+                            <span
+                              class="text-[#51459E]">{{ product.quantity_sold }}</span>
+                          </p>
+                          <p
+                            class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                            Rating:
+                            <span
+                              class="text-[#51459E]">{{ product.rating|floatformat:"2" }}/5 <i
+                              class="fa-solid fa-star text-yellow-500"></i></span>
+                          </p>
+                        </div>
+                        <div
+                          class="w-[250px] flex justify-center items-center bg-white border border-[#51459E] absolute bottom-0">
+      <span
+        class="w-full h-full px-2 block text-center truncate text-xl font-Primary-bold text-red-600 transition-all duration-500 ease-in-out cursor-pointer">{{ product.shop }}.vn</span>
+                        </div>
+
+                      </div>
+                    </a>
+                    <!-- End the product image card -->
+
+                    <!-- Product card detail -->
+                    <div
+                      class="product-card-detail flex w-[250px] justify-between px-2 mb-2">
+
+                      <!-- Product card infor -->
+                      <div
+                        class="product-card-infor w-10/12 flex flex-col">
+                        <a
+                          href="{% url 'to_product' id=product.id %}"
+                          target="_blank">
+        <span
+          class="product-card-name w-full h-full block font-Primary-medium text-lg truncate text-[#51459E]">{{ product.product_name }}</span>
+                        </a>
+                        <span
+                          class="product-card-price font-Primary-bold text-red-500 text-lg">{{ product.price|intcomma }}đ</span>
+                      </div>
+                      <!-- End the product card infor -->
+
+                      <button class="link-btn"
+                              id="link-{{ product.id }}">
+                        <i
+                          class="fa-solid fa-heart text-gray-400 hover:text-red-600 text-3xl cursor-pointer"></i>
+                      </button>
+                    </div>
+                    <!-- End the product card detail -->
+
+                  </div>
+                {% endif %}
+                <!-- End the product card -->
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <!-- Display card section -->
+
+        </section>
+        <!-- End the display image section wrapper-->
+
+      </div>
+      <!-- End the main content section -->
+
+    </div>
+    <!-- End the page content -->
+  </div>
+</div>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script
+  src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+{% block javascript %}
+  <script>
+    $(document).on('click', '.link-btn', function () {
+      var $this = $(this);
+      var id = $this.attr('id').split('-')[1];
+      var url = "{% url 'add_favorite' id=0 %}".replace('0', id);
+      $.ajax({
+        type: 'GET',
+        url: url,
+        dataType: 'json',
+        statusCode: {
+          200: function (res) {
+            console.log(res);
+            alert('Add to favorite!')
+          },
+          400: function (res) {
+            alert('Remove favorite!')
+          },
+          403: function () {
+            alert('Please login to continue!')
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}
+</body>
+
+</html>

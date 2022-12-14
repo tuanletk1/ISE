@@ -1,0 +1,274 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+  <link rel="stylesheet" href="{% static 'main.css' %}"
+        type="text/css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script
+    src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+  <title>Image Search Engine</title>
+</head>
+
+<body>
+<div
+  class="wrapper max-w-[1500px] m-auto bg-[#F6FAFF] flex font-Primary-regular">
+  <!-- Container -->
+  <div class="container bg-white m-auto">
+
+    <!-- Header -->
+    <header class="header border-b-4 border-[#F6F6F6]">
+
+      <!-- Navbar -->
+      <nav
+        class="navbar flex justify-between items-center w-full pl-16 pr-10 py-1">
+
+        <!-- The logo of page -->
+        <h1 class="logo">
+          <a href="{% url 'homepage' %}"
+             class="w-full h-full">
+            {#              <img src="../../static/assets/images/Logo_ISE_fullHD.svg" alt="The logo of Image Search Engine" class="w-full h-full">#}
+            <img
+              src="../../static/assets/images/Logo_ISE_fullHD.png"
+              alt="The logo of Image Search Engine">
+          </a>
+        </h1>
+        <!-- End the logo of page -->
+
+        <!-- The information of the user -->
+        <div
+          class="infor-user flex gap-3 justify-center items-center group cursor-pointer">
+          <div class="avtar-user w-[60px] h-[60px]">
+            <img src="../../static/assets/images/cat.jpg"
+                 alt="The Avatar"
+                 class="w-[60px] h-[60px] rounded-full">
+          </div>
+          {% if request.session.auth %}
+            <div
+              class="detail-infor-user flex flex-col h-full relative w-[190px] p-2 overflow-hidden">
+              <span
+                class="font-Primary-bold text-[#25396F] text-xl truncate">{{ request.session.auth.username }} </span>
+              <span
+                class="font-Primary-bold text-[#7C8DB5] text-lg truncate">{{ request.session.auth.email }}</span>
+              <div
+                class="w-full right-0 translate-x-full group-hover:translate-x-0 rounded-l-xl py-2 px-4 bg-slate-100 z-10 absolute border-2 border-[#51459E] border-dashed transition-all duration-500 ease-in-out">
+                <a href="{% url 'logout' %}">
+                  <button onclick="{console.log('logout')}"
+                          class="w-full flex justify-between items-center font-Primary-bold text-lg pl-2 text-blue-700 uppercase">
+                    Sign
+                    out
+                    <i
+                      class="fa-solid fa-right-from-bracket border-2 border-blue-500 p-2 text-blue-500"></i>
+                  </button>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        <!-- End the information of the user -->
+
+      </nav>
+      <!-- End the navbar -->
+
+    </header>
+    <!-- End the header -->
+
+    <!-- Page content -->
+    <div class="content flex my-4">
+
+      <!-- Side menu section -->
+      <div
+        class="side-menu flex flex-col w-1/4 h-full justify-center items-center border-r-2 border-[#F6F6F6]">
+
+        <!-- Dashboard button -->
+        <div class="dashboard-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'homepage' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-sliders text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Home</span>
+        <!-- End the dashboard button -->
+
+        {% if request.session.auth.permission == 'admin' %}
+          <!-- User management button -->
+          <div class="user-management-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'user' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-user-large text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">User</span>
+          <!-- End the user management button -->
+
+          <!-- Moderator management button -->
+          <div class="moderator-management-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'mod' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-user-shield text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Moderator</span>
+          <!-- End the moderator management button -->
+        {% endif %}
+
+        <!-- Crawl Data button -->
+        {% if request.session.auth.permission != 'user' %}
+          <div class="crawl-data-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+            <a href="{% url 'crawl' %}" class="p-[15px]">
+              <i
+                class="fa-solid fa-database text-xl text-[#51459E]"></i>
+            </a>
+          </div>
+          <span
+            class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Crawl Data</span>
+          <!-- End the dashboard button -->
+        {% endif %}
+
+        <!-- Recent button -->
+        <div class="recent-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'recent' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-clock text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center font-Primary-bold font-semibold text-[#1C295D]">Recent</span>
+        <!-- End the recent button -->
+
+        <!-- Favorites button -->
+        <div class="favorites-button w-[50px] h-[50px] bg-[#ECEFF7] transition-all duration-300 ease-in-out
+          border-2 hover:border-[#51459E] hover:scale-125 rounded-[10px] flex justify-center items-center">
+          <a href="{% url 'favorite' %}" class="p-[15px]">
+            <i
+              class="fa-solid fa-heart text-xl text-[#51459E]"></i>
+          </a>
+        </div>
+        <span
+          class="m-[15px] flex text-center 2font-Primary-bold font-semibold text-[#1C295D]">Favorites</span>
+        <!-- End the favorites button -->
+
+      </div>
+      <!-- End the side menu section -->
+
+      <!-- Main content -->
+      <div class="main-content w-full mx-10">
+
+        <!-- Upload image section -->
+        <form action="{% url 'search' %}" method="post"
+              enctype="multipart/form-data"
+              onsubmit="document.getElementById('button_submit').disabled=true;">
+          {% csrf_token %}
+          <input type="file" hidden name="img_file"
+                 id="image" onchange="form.submit()">
+          <section class="upload-image-section bg-[#F6F5FF] flex rounded-xl py-[50px]
+              justify-center items-center drop-shadow-lg">
+            <div
+              class="flex flex-col items-center text-center">
+              <h2
+                class="label text-[#51459E] font-Primary-bold font-bold text-3xl">
+                Image Search
+                Engine</h2>
+              <p
+                class="guide my-[28px] text-[#7987A5] font-Primary-bold font-semibold text-xl">
+                Welcome to ISE's product search engine.<br>
+                To start your search, please click the
+                Upload Image button below.
+              </p>
+              <button
+                onclick="document.getElementById('image').click()"
+                type="button" class="w-[200px] h-[40px] font-Primary-bold font-medium text-lg flex justify-center
+                  items-center border-2 bg-[#51459E] p-5 rounded-[10px] text-[#DEE1E6]
+                  hover:bg-[#DEE1E6] hover:text-[#51459E] hover:border-[#51459E]
+                  transition-all duration-500 ease-in-out uppercase"
+                id="button_submit"
+              >upload image
+              </button>
+            </div>
+          </section>
+        </form>
+        <!-- End the upload section -->
+
+        <!-- Display image section wrapper -->
+        <section
+          class="display-image-section flex flex-wrap mt-10 mb-5 w-full justify-between drop-shadow-lg">
+          {% for product in products %}
+            <!-- Display image section -->
+            <div class="group w-[250px] flex flex-col justify-center items-center relative mb-6 transition-all duration-300 ease-in-out
+            hover:scale-105 rounded-2xl overflow-hidden border-2 border-gray-300">
+              <a href="{% url 'to_product' id=product.id %}"
+                 target="_blank">
+                <img src="{{ product.images_link }}"
+                     class="w-[250px] rounded-2xl">
+                <i class="fa-solid fa-ellipsis-vertical text-3xl flex z-40
+                right-2 px-1 absolute z-10 top-2 text-[#3734A9] border border-[#3734A9] bg-white rounded-lg"></i>
+              </a>
+              <div
+                class="overlay-content px-2 pt-12 align-middle items-center bg-slate-100 absolute w-full h-[330px] top-0 z-10 duration-700 ease-in-out translate-x-full group-hover:translate-x-0">
+                      <span
+                        class="absolute text-base uppercase w-[190px] h-[42px] font-Primary-bold py-2 text-red-500 ml-2 top-0 left-0 border-b-2 border-red-500 border-dashed">More
+                        information</span>
+                <p
+                  class="line-clamp-3 mb-2 text-base font-Primary-bold text-[#51459E] w-full">{{ product.product_name }}</p>
+                <p
+                  class="flex w-full pt-2 justify-between font-Primary-bold text-base text-red-500 border-t-2 border-red-500 border-dashed ">
+                  Price:
+                  <span
+                    class="text-[#51459E]">{{ product.price|intcomma }}đ </span>
+                </p>
+                <p
+                  class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                  Discount: <span
+                  class="text-[#51459E]">{{ product.discount }}
+                          <i
+                            class="fa-solid fa-percent"></i></span>
+                </p>
+                <p
+                  class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                  Quantity Sold:
+                  <span
+                    class="text-[#51459E]">{{ product.quantity_sold }}</span>
+                </p>
+                <p
+                  class="flex w-full justify-between font-Primary-bold text-base text-red-500">
+                  Rating:
+                  <span
+                    class="text-[#51459E]">{{ product.rating|floatformat:"2" }}/5 <i
+                    class="fa-solid fa-star text-yellow-500"></i></span>
+                </p>
+              </div>
+            </div>
+            <!-- End the display image section -->
+          {% endfor %}
+        </section>
+        <!-- End the display image section wrapper -->
+
+      </div>
+      <!-- End the main content section -->
+
+    </div>
+    <!-- End the page content -->
+
+  </div>
+  <!-- End the container -->
+
+</div>
+
+</body>
+
+</html>
